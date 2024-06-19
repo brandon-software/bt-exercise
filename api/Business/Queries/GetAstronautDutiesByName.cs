@@ -28,8 +28,17 @@ namespace StargateAPI.Business.Queries
             var query = $"SELECT a.Id as PersonId, a.Name, b.CurrentRank, b.CurrentDutyTitle, b.CareerStartDate, b.CareerEndDate FROM [Person] a LEFT JOIN [AstronautDetail] b on b.PersonId = a.Id WHERE \'{request.Name}\' = a.Name";
 
             var person = await _context.Connection.QueryFirstOrDefaultAsync<PersonAstronaut>(query);
-
-            result.Person = person;
+            
+            if (person != null)
+            {
+                result.Person = person;
+            }
+            else
+            {
+                // Handle the case when person is null
+                // For example, you can throw an exception or set a default value
+                throw new Exception("Person not found.");
+            }
 
             query = $"SELECT * FROM [AstronautDuty] WHERE {person.PersonId} = PersonId Order By DutyStartDate Desc";
 
@@ -44,7 +53,7 @@ namespace StargateAPI.Business.Queries
 
     public class GetAstronautDutiesByNameResult : BaseResponse
     {
-        public PersonAstronaut Person { get; set; }
+        public PersonAstronaut? Person { get; set; }
         public List<AstronautDuty> AstronautDuties { get; set; } = new List<AstronautDuty>();
     }
 }
