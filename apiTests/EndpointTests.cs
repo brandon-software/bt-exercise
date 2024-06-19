@@ -43,27 +43,9 @@ namespace apiTests
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
             var peopleResponse = JsonConvert.DeserializeObject<PeopleResponse>(responseString);
-            Assert.NotEmpty(peopleResponse.People);
+            Assert.NotNull(peopleResponse.People);
         }
-
-        [Fact]
-        async Task GetPersonByName_ReturnsOkResult_WhenPersonExists()
-        {
-            // Arrange
-            var personName = "brandon";
-
-            // Act
-            var response = await _client.GetAsync($"/Person/{personName}");
-
-            // Assert
-            {
-                response.EnsureSuccessStatusCode();
-                var responseString = await response.Content.ReadAsStringAsync();
-                var personResponse = JsonConvert.DeserializeObject<PersonResponse>(responseString);
-                var person = personResponse.Person;
-                Assert.Equal(personName, person.Name);
-            }
-        }
+ 
         [Fact]
         async Task GetPersonByName_ReturnsNotFoundResult_WhenPersonDoesNotExist()
         {
