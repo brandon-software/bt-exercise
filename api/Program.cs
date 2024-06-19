@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Commands;
 using StargateAPI.Business.Data;
+using Serilog;
+using Serilog.Sinks.SystemConsole;
+using Serilog.Sinks.MSSqlServer;
+using Microsoft.Extensions.Hosting;
+using Serilog.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +23,24 @@ builder.Services.AddMediatR(cfg =>
     cfg.AddRequestPreProcessor<CreateAstronautDutyPreProcessor>();
     cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly);
 });
+
+// Read the logging settings
+var connectionString = builder.Configuration.GetConnectionString("Serilog");
+var tableName = builder.Configuration["Logging:Serilog:TableName"];
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    // .WriteTo.MSSqlServer(
+    //     connectionString: connectionString,
+    //     sinkOptions: new MSSqlServerSinkOptions
+    //     {
+    //         TableName = tableName,
+    //         AutoCreateSqlTable = true
+    //     })
+    .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information) // Log only warnings and errors to the console
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 
