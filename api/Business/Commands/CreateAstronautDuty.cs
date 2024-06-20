@@ -23,9 +23,9 @@ namespace StargateAPI.Business.Commands
     public class CreateAstronautDutyPreProcessor : IRequestPreProcessor<CreateAstronautDuty>
     {
         private readonly StargateContext _context;
-        private readonly ILogger<CreateAstronautDutyHandler> _logger;
+        private readonly ILogger<CreateAstronautDutyPreProcessor> _logger;
 
-        public CreateAstronautDutyPreProcessor(StargateContext context, ILogger<CreateAstronautDutyHandler> logger)
+        public CreateAstronautDutyPreProcessor(StargateContext context, ILogger<CreateAstronautDutyPreProcessor> logger)
         {
             _context = context;
             _logger = logger;            

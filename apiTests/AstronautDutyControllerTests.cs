@@ -42,5 +42,21 @@ namespace apiTests
             var returnValue = Assert.IsType<CreateAstronautDutyResult>(okResult.Value);
             Assert.Equal(result.Id, returnValue.Id);
         }
+        // get all duties by name does not exist
+        [Fact]
+        public async Task GetAstronautDutiesByName_ReturnsNotFoundResult_WhenDutiesDoNotExist()
+        {
+            // Arrange
+            var duties = new List<AstronautDuty>();
+            var getDutiesResult = new GetAstronautDutiesByNameResult { AstronautDuties = duties };
+            _mediatorMock.Setup(m => m.Send(It.IsAny<GetAstronautDutiesByName>(), default)).ReturnsAsync(getDutiesResult);
+            
+            // Act
+            var result = await _controller.GetAstronautDutiesByName("Test Name");
+            
+            var okResult = Assert.IsType<ObjectResult>(result);
+            var returnValue = Assert.IsType<BaseResponse>(okResult.Value);
+        }
+       
     }
 }

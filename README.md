@@ -3,6 +3,30 @@
 
 ***
 
+Exercise Review Notes:
+
+Approach:
+- Review the requirements and the codebase
+- Verify the system requirements are met
+- Work towards completing the tasks
+
+Current Status:
+- Completed high priority tasks.
+- Additional testing for code coverage and functionality is needed
+- UI Not implemented.
+
+Work items (ie out of scope?) not in the original requirements:
+   ACTS (api) does not allow for removal/deletion of records. 
+   Potential data integrity issues:
+   - Duplicate Person records i.e. name allowed
+   - Duplicate "Retired" records allowed
+
+Additional testing (out of scope?) not in the original requirements:
+   Functional
+   Stress
+
+***
+
 ## Astronaut Career Tracking System (ACTS)
 
 ACTS is used as a tool to maintain a record of all the People that have served as Astronauts. When serving as an Astronaut, your *Job* (Duty) is tracked by your Rank, Title and the Start and End Dates of the Duty.

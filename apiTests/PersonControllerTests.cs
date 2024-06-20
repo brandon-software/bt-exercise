@@ -6,6 +6,7 @@ using Xunit;
 using StargateAPI.Controllers;
 using StargateAPI.Business.Data;
 using StargateAPI.Business.Queries;
+using StargateAPI.Business.Commands;
 
 namespace apiTests
 {
@@ -109,6 +110,36 @@ namespace apiTests
             // Assert
             var notFoundResult = Assert.IsType<ObjectResult>(result);
         }
+        // add person creation test
+        [Fact]
+        public async Task CreatePerson_ReturnsOkResult_WhenPersonIsCreated()
+        {
+            // Arrange
+            var person = new StargateAPI.Business.Dtos.PersonAstronaut { Name="Jeff Doe"};
+            var createPersonResult = new CreatePersonResult {  }; 
+            _mediatorMock.Setup(m => m.Send(It.IsAny<CreatePerson>(), default)).ReturnsAsync(createPersonResult);
 
+            // Act
+            var result = await _controller.CreatePerson(person.Name);
+
+            // Assert
+            var okResult = Assert.IsType<ObjectResult>(result);
+            var returnValue = Assert.IsType<CreatePersonResult>(okResult.Value);
+            Assert.Equal(createPersonResult, returnValue);
+        }
+        // add person creation test when an exception is thrown
+        [Fact]
+        public async Task CreatePerson_ReturnsInternalServerErrorResult_WhenExceptionIsThrown()
+        {
+            // Arrange
+            _mediatorMock.Setup(m => m.Send(It.IsAny<CreatePerson>(), default)).ThrowsAsync(new Exception());
+
+            // Act
+            var result = await _controller.CreatePerson("Test Name");
+
+            // Assert
+            var internalServerErrorResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, internalServerErrorResult.StatusCode);
+        }
     }
 }
