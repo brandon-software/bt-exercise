@@ -14,16 +14,21 @@ namespace StargateAPI.Business.Commands
     public class CreatePersonPreProcessor : IRequestPreProcessor<CreatePerson>
     {
         private readonly StargateContext _context;
-        public CreatePersonPreProcessor(StargateContext context)
+        private readonly ILogger<CreatePersonPreProcessor> _logger;
+
+        public CreatePersonPreProcessor(StargateContext context, ILogger<CreatePersonPreProcessor> logger)
         {
             _context = context;
+            _logger = logger;            
         }
         public Task Process(CreatePerson request, CancellationToken cancellationToken)
         {
             var person = _context.People.AsNoTracking().FirstOrDefault(z => z.Name == request.Name);
 
             if (person is not null) throw new BadHttpRequestException("Bad Request");
-
+   
+            _logger.LogInformation($"CreatePerson Request OK: Name - {request.Name}");
+         
             return Task.CompletedTask;
         }
     }
@@ -31,11 +36,14 @@ namespace StargateAPI.Business.Commands
     public class CreatePersonHandler : IRequestHandler<CreatePerson, CreatePersonResult>
     {
         private readonly StargateContext _context;
+        private readonly ILogger<CreatePersonHandler> _logger;
 
-        public CreatePersonHandler(StargateContext context)
+        public CreatePersonHandler(StargateContext context, ILogger<CreatePersonHandler> logger)
         {
             _context = context;
+            _logger = logger;            
         }
+
         public async Task<CreatePersonResult> Handle(CreatePerson request, CancellationToken cancellationToken)
         {
 
@@ -47,6 +55,8 @@ namespace StargateAPI.Business.Commands
                 await _context.People.AddAsync(newPerson);
 
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Person with ID: {newPerson.Id} and Name:{newPerson.Name} created");
 
                 return new CreatePersonResult()
                 {

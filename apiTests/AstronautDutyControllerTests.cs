@@ -29,7 +29,8 @@ namespace apiTests
             { 
                 Name = "Test Name",
                 Rank = "Test Rank",
-                DutyTitle = "Test DutyTitle"
+                DutyTitle = "Test DutyTitle",
+                DutyStartDate = new System.DateTime(2021, 1, 1)                
             };
             var result = new CreateAstronautDutyResult { Id = 1 };
             _mediatorMock.Setup(m => m.Send(It.IsAny<CreateAstronautDuty>(), default)).ReturnsAsync(result);
@@ -54,9 +55,11 @@ namespace apiTests
             // Act
             var result = await _controller.GetAstronautDutiesByName("Test Name");
             
+            // Assert
             var okResult = Assert.IsType<ObjectResult>(result);
             var returnValue = Assert.IsType<BaseResponse>(okResult.Value);
+            Assert.False(returnValue.Success);
         }
-       
+        
     }
 }
