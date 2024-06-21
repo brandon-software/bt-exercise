@@ -1,7 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using StargateAPI.Business.Commands;
 using StargateAPI.Business.Queries;
+using System;
 using System.Net;
 
 namespace StargateAPI.Controllers
@@ -12,9 +14,12 @@ namespace StargateAPI.Controllers
     public class PersonController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public PersonController(IMediator mediator)
+        private readonly ILogger<PersonController> _logger;
+
+        public PersonController(IMediator mediator, ILogger<PersonController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         [HttpGet("")]
@@ -31,6 +36,7 @@ namespace StargateAPI.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while processing GetPeople request.");
                 return this.GetResponse(new BaseResponse()
                 {
                     Message = ex.Message,
@@ -54,6 +60,7 @@ namespace StargateAPI.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while processing GetPersonByName request.");
                 return this.GetResponse(new BaseResponse()
                 {
                     Message = ex.Message,
@@ -77,6 +84,7 @@ namespace StargateAPI.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while processing CreatePerson request.");
                 return this.GetResponse(new BaseResponse()
                 {
                     Message = ex.Message,

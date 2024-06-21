@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using Xunit;
+using Microsoft.Extensions.Logging;
 using StargateAPI.Controllers;
 using StargateAPI.Business.Data;
 using StargateAPI.Business.Queries;
@@ -13,12 +14,14 @@ namespace apiTests
     public class PersonControllerTests
     {
         private readonly Mock<IMediator> _mediatorMock;
+        private readonly Mock<ILogger<PersonController>> _loggerMock;
         private readonly PersonController _controller;
 
         public PersonControllerTests()
         {
             _mediatorMock = new Mock<IMediator>();
-            _controller = new PersonController(_mediatorMock.Object);
+            _loggerMock = new Mock<ILogger<PersonController>>();            
+            _controller = new PersonController(_mediatorMock.Object, _loggerMock.Object);
         }
 
         [Fact]
