@@ -42,7 +42,7 @@ namespace StargateAPI.Controllers
                     Success = false,
                     ResponseCode = (int)HttpStatusCode.InternalServerError
                 });
-            }            
+            }
         }
 
         [HttpPost("")]

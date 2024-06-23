@@ -3,6 +3,7 @@ using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Data;
 using StargateAPI.Controllers;
+using Microsoft.AspNetCore.Http;
 
 namespace StargateAPI.Business.Commands
 {
@@ -19,17 +20,16 @@ namespace StargateAPI.Business.Commands
         public CreatePersonPreProcessor(StargateContext context, ILogger<CreatePersonPreProcessor> logger)
         {
             _context = context;
-            _logger = logger;            
+            _logger = logger;
         }
-        public Task Process(CreatePerson request, CancellationToken cancellationToken)
+
+        public async Task Process(CreatePerson request, CancellationToken cancellationToken)
         {
-            var person = _context.People.AsNoTracking().FirstOrDefault(z => z.Name == request.Name);
+            var person = await _context.People.AsNoTracking().FirstOrDefaultAsync(z => z.Name == request.Name);
 
             if (person is not null) throw new BadHttpRequestException("Bad Request");
-   
+
             _logger.LogInformation($"CreatePerson Request OK: Name - {request.Name}");
-         
-            return Task.CompletedTask;
         }
     }
 
@@ -41,28 +41,26 @@ namespace StargateAPI.Business.Commands
         public CreatePersonHandler(StargateContext context, ILogger<CreatePersonHandler> logger)
         {
             _context = context;
-            _logger = logger;            
+            _logger = logger;
         }
 
         public async Task<CreatePersonResult> Handle(CreatePerson request, CancellationToken cancellationToken)
         {
+            var newPerson = new Person
+            {
+                Name = request.Name
+            };
 
-                var newPerson = new Person()
-                {
-                   Name = request.Name
-                };
+            await _context.People.AddAsync(newPerson, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
-                await _context.People.AddAsync(newPerson);
 
-                await _context.SaveChangesAsync();
+            _logger.LogInformation($"Person with ID: {newPerson.Id} and Name: {newPerson.Name} created");
 
-                _logger.LogInformation($"Person with ID: {newPerson.Id} and Name:{newPerson.Name} created");
-
-                return new CreatePersonResult()
-                {
-                    Id = newPerson.Id
-                };
-          
+            return new CreatePersonResult()
+            {
+                Id = newPerson.Id
+            };
         }
     }
 

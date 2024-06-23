@@ -20,7 +20,7 @@ namespace apiTests
         public AstronautDutyControllerTests()
         {
             _mediatorMock = new Mock<IMediator>();
-            _loggerMock = new Mock<ILogger<AstronautDutyController>>();  
+            _loggerMock = new Mock<ILogger<AstronautDutyController>>();
             _controller = new AstronautDutyController(_mediatorMock.Object, _loggerMock.Object);
         }
 
@@ -28,12 +28,12 @@ namespace apiTests
         public async Task CreateAstronautDuty_ReturnsOkResult_WhenDutyIsCreated()
         {
             // Arrange
-            var request = new CreateAstronautDuty 
-            { 
+            var request = new CreateAstronautDuty
+            {
                 Name = "Test Name",
                 Rank = "Test Rank",
                 DutyTitle = "Test DutyTitle",
-                DutyStartDate = new System.DateTime(2021, 1, 1)                
+                DutyStartDate = new System.DateTime(2021, 1, 1)
             };
             var result = new CreateAstronautDutyResult { Id = 1 };
             _mediatorMock.Setup(m => m.Send(It.IsAny<CreateAstronautDuty>(), default)).ReturnsAsync(result);
@@ -46,6 +46,7 @@ namespace apiTests
             var returnValue = Assert.IsType<CreateAstronautDutyResult>(okResult.Value);
             Assert.Equal(result.Id, returnValue.Id);
         }
+
         // get all duties by name does not exist
         [Fact]
         public async Task GetAstronautDutiesByName_ReturnsNotFoundResult_WhenDutiesDoNotExist()
@@ -54,15 +55,15 @@ namespace apiTests
             var duties = new List<AstronautDuty>();
             var getDutiesResult = new GetAstronautDutiesByNameResult { AstronautDuties = duties };
             _mediatorMock.Setup(m => m.Send(It.IsAny<GetAstronautDutiesByName>(), default)).ReturnsAsync(getDutiesResult);
-            
+
             // Act
             var result = await _controller.GetAstronautDutiesByName("Test Name");
-            
+
             // Assert
             var okResult = Assert.IsType<ObjectResult>(result);
             var returnValue = Assert.IsType<BaseResponse>(okResult.Value);
             Assert.False(returnValue.Success);
         }
-        
+
     }
 }

@@ -28,21 +28,20 @@ namespace StargateAPI.Business.Commands
         public CreateAstronautDutyPreProcessor(StargateContext context, ILogger<CreateAstronautDutyPreProcessor> logger)
         {
             _context = context;
-            _logger = logger;            
+            _logger = logger;
         }
 
-        public Task Process(CreateAstronautDuty request, CancellationToken cancellationToken)
+        public async Task Process(CreateAstronautDuty request, CancellationToken cancellationToken)
         {
-            var person = _context.People.AsNoTracking().FirstOrDefault(z => z.Name == request.Name);
+            var person = await _context.People.AsNoTracking().FirstOrDefaultAsync(z => z.Name == request.Name);
 
             if (person is null) throw new BadHttpRequestException("Bad Request");
 
-            var verifyNoPreviousDuty = _context.AstronautDuties.FirstOrDefault(z => z.DutyTitle == request.DutyTitle && z.DutyStartDate == request.DutyStartDate);
+            var verifyNoPreviousDuty = await _context.AstronautDuties.FirstOrDefaultAsync(z => z.DutyTitle == request.DutyTitle && z.DutyStartDate == request.DutyStartDate);
 
             if (verifyNoPreviousDuty is not null) throw new BadHttpRequestException("Bad Request");
 
             _logger.LogInformation($"Astronaut Duty Request OK: Name - {request.Name}, Rank - {request.Rank}, DutyTitle - {request.DutyTitle}, DutyStartDate - {request.DutyStartDate}");
-            return Task.CompletedTask;
         }
     }
 
@@ -53,29 +52,29 @@ namespace StargateAPI.Business.Commands
         public CreateAstronautDutyHandler(StargateContext context, ILogger<CreateAstronautDutyHandler> logger)
         {
             _context = context;
-            _logger = logger;            
+            _logger = logger;
 
         }
         public async Task<CreateAstronautDutyResult> Handle(CreateAstronautDuty request, CancellationToken cancellationToken)
         {
-
-            var query = $"SELECT * FROM [Person] WHERE \'{request.Name}\' = Name";
-
-            var person = await _context.Connection.QueryFirstOrDefaultAsync<Person>(query);
+            var query = "SELECT * FROM [Person] WHERE Name = @Name";
+            var person = await _context.Connection.QueryFirstOrDefaultAsync<Person>(query, new { Name = request.Name });
 
             if (person is null) throw new BadHttpRequestException("Bad Request");
 
-            query = $"SELECT * FROM [AstronautDetail] WHERE {person.Id} = PersonId";
-
-            var astronautDetail = await _context.Connection.QueryFirstOrDefaultAsync<AstronautDetail>(query);
+            query = "SELECT * FROM [AstronautDetail] WHERE PersonId = @PersonId";
+            var astronautDetail = await _context.Connection.QueryFirstOrDefaultAsync<AstronautDetail>(query, new { PersonId = person.Id });
 
             if (astronautDetail == null)
             {
-                astronautDetail = new AstronautDetail();
-                astronautDetail.PersonId = person.Id;
-                astronautDetail.CurrentDutyTitle = request.DutyTitle;
-                astronautDetail.CurrentRank = request.Rank;
-                astronautDetail.CareerStartDate = request.DutyStartDate.Date;
+                astronautDetail = new AstronautDetail
+                {
+                    PersonId = person.Id,
+                    CurrentDutyTitle = request.DutyTitle,
+                    CurrentRank = request.Rank,
+                    CareerStartDate = request.DutyStartDate.Date
+                };
+
                 if (request.DutyTitle == "RETIRED")
                 {
                     astronautDetail.CareerEndDate = request.DutyStartDate.Date;
@@ -96,9 +95,8 @@ namespace StargateAPI.Business.Commands
                 _logger.LogInformation($"Astronaut Detail with ID: {astronautDetail.Id} updated");
             }
 
-            query = $"SELECT * FROM [AstronautDuty] WHERE {person.Id} = PersonId AND DutyEndDate IS NULL Order By DutyStartDate Desc";
-
-            var astronautDuty = await _context.Connection.QueryFirstOrDefaultAsync<AstronautDuty>(query);
+            query = "SELECT * FROM [AstronautDuty] WHERE PersonId = @PersonId AND DutyEndDate IS NULL ORDER BY DutyStartDate DESC";
+            var astronautDuty = await _context.Connection.QueryFirstOrDefaultAsync<AstronautDuty>(query, new { PersonId = person.Id });
 
             if (astronautDuty != null)
             {
@@ -121,7 +119,7 @@ namespace StargateAPI.Business.Commands
             await _context.SaveChangesAsync();
 
             _logger.LogInformation($"New Astronaut Duty created with ID: {newAstronautDuty.Id}");
-            return new CreateAstronautDutyResult()
+            return new CreateAstronautDutyResult
             {
                 Id = newAstronautDuty.Id
             };
