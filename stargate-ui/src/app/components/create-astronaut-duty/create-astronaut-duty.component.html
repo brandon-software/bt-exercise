@@ -1,0 +1,40 @@
+<form [formGroup]="createPersonForm" (ngSubmit)="submitCreatePersonForm()">
+    <div class="form-item-container">
+        <h4>Person</h4>
+        <div>
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" id="name" formControlName="name">
+            </div>
+            <div class="button-container">
+                <button type="submit">Create</button>
+            </div>
+        </div>
+    </div>
+</form>
+<br>
+
+<form [formGroup]="astronautDutyForm" (ngSubmit)="submitCreateAstronautDutyForm()">
+    <div class="form-item-container">
+        <h4>Astronaut Duty</h4>
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" formControlName="name">
+        </div>
+        <div>
+            <label for="rank">Rank:</label>
+            <input type="text" id="rank" formControlName="rank">
+        </div>
+        <div>
+            <label for="dutyTitle">Duty Title:</label>
+            <input type="text" id="dutyTitle" formControlName="dutyTitle">
+        </div>
+        <div>
+            <label for="dutyStartDate">Duty Start Date:</label>
+            <input type="date" id="dutyStartDate" formControlName="dutyStartDate">
+        </div>
+        <div class="button-container">
+            <button type="submit">Create</button>
+        </div>
+    </div>
+</form>

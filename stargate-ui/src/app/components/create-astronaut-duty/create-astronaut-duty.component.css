@@ -1,0 +1,65 @@
+.form-item-container {
+    overflow: auto;
+    border-bottom: 1px dashed black;
+    /* set width of the container */
+    width: 603px;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.form-item-container button {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.form-item-container label {
+    display: inline-block;
+    width: 250px;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.form-item-container input[type="text"],
+.form-item-container input[type="checkbox"],
+.form-item-container input[type="number"],
+.form-item-container input[type="date"] {
+    margin-left: 10px;
+}
+
+.form-item-container .multiple-date-manager input {
+    margin-left: 270px;
+}
+
+.form-item-container .multiple-date-manager .add-button {
+    margin-left: 402px;
+}
+
+.form-item-container .multiple-date-manager .remove-button {
+    margin-left: 5px;
+}
+
+.form-item-container .multiple-date-manager .remove-button,
+.form-item-container .multiple-date-manager .add-button {
+    width: 20px;
+    font-weight: bold;
+}
+
+.form-item-container button:enabled {
+    background-color: #007BFF;
+    color: white;
+}
+
+.button-container {
+    width: 603px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-container button {
+    width: 150px;
+    height: 40px;
+    margin: 10px;
+}

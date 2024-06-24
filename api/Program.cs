@@ -10,6 +10,8 @@ using Serilog.Extensions.Hosting;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// add     // Register IMemoryCache
+builder.Services.AddMemoryCache();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -25,6 +27,13 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly);
 });
 
+builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowSpecificOrigin",
+            builder => builder.WithOrigins("http://localhost:4200") // Replace with the actual origin of your Angular app
+                              .AllowAnyMethod()
+                              .AllowAnyHeader());
+    });
 // Read the logging settings
 var connectionString = builder.Configuration.GetConnectionString("Serilog");
 var tableName = builder.Configuration["Logging:Serilog:TableName"];
@@ -59,5 +68,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
 
