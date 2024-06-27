@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/stargate-ui",
+            "outputPath": "./../api/wwwroot/",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -34,6 +34,10 @@
           },
           "configurations": {
             "production": {
+              "outputPath": {
+                "base": "./../api/wwwroot/",
+                "browser": ""
+              },
               "budgets": [
                 {
                   "type": "initial",
@@ -58,8 +62,7 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-            "options": {
-          },
+          "options": {},
           "configurations": {
             "production": {
               "buildTarget": "stargate-ui:build:production"

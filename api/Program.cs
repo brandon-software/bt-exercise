@@ -6,11 +6,16 @@ using Serilog.Sinks.SystemConsole;
 using Serilog.Sinks.MSSqlServer;
 using Microsoft.Extensions.Hosting;
 using Serilog.Extensions.Hosting;
+using Microsoft.Extensions.FileProviders;
+using System;
+using System.IO;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// add     // Register IMemoryCache
+// Register IMemoryCache
 builder.Services.AddMemoryCache();
 
 builder.Services.AddControllers();
@@ -27,13 +32,6 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(typeof(Program).Assembly);
 });
 
-builder.Services.AddCors(options =>
-    {
-        options.AddPolicy("AllowSpecificOrigin",
-            builder => builder.WithOrigins("http://localhost:4200") // Replace with the actual origin of your Angular app
-                              .AllowAnyMethod()
-                              .AllowAnyHeader());
-    });
 // Read the logging settings
 var connectionString = builder.Configuration.GetConnectionString("Serilog");
 var tableName = builder.Configuration["Logging:Serilog:TableName"];
@@ -51,6 +49,15 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins(allowedOrigins)
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
 
 var app = builder.Build();
 
@@ -61,9 +68,35 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowSpecificOrigin");
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+var contentTypeProvider = new FileExtensionContentTypeProvider();
+
+// Add or replace MIME type mappings
+contentTypeProvider.Mappings[".json"] = "application/json"; // Example of replacing an existing mapping
+
+// Configure StaticFileOptions with the custom provider
+var options = new StaticFileOptions
+{
+    ContentTypeProvider = contentTypeProvider
+};
+
+// Configure default file mapping
+app.UseDefaultFiles(new DefaultFilesOptions
+{
+    DefaultFileNames = new List<string> { "index.html" }
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    // RequestPath = "/wwwroot"
+});
+
+Log.Information("Serving static files from: {StaticFilePath}", Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"));
 
 app.MapControllers();
 

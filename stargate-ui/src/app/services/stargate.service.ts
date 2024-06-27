@@ -3,8 +3,8 @@ import axios from 'axios';
 import { GetAstronautDutyByNameResponse, PostAstronautDutyData, CreateAstronautDuty, PostAstronautDutyResponse } from './../models/astronautDuty.model';
 import { CreatePerson, PostPersonResponse, GetPeopleResponse, GetPersonByNameData, GetPersonByNameResponse } from './../models/person.model';
 
-// const BASE_URL = 'http://127.0.0.1:5204';
-const BASE_URL = 'http://localhost:5204';
+const BASE_URL = 'http://127.0.0.1:5205';
+// const BASE_URL = 'http://localhost:5204';
 
 async function postPerson(data: CreatePerson): Promise<PostPersonResponse> {
   try {
